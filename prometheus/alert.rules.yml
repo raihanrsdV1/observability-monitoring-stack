@@ -1,0 +1,47 @@
+groups:
+  - name: application_alerts
+    interval: 5s
+    rules:
+      # Alert when CPU usage is above 70%
+      - alert: HighCPUUsage
+        expr: app_cpu_usage_percent > 70
+        for: 10s
+        labels:
+          severity: warning
+          service: demo-app
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is {{ $value }}% (threshold: 70%)"
+
+      # Alert when application is unhealthy
+      - alert: ApplicationUnhealthy
+        expr: app_health_status == 0
+        for: 10s
+        labels:
+          severity: critical
+          service: demo-app
+        annotations:
+          summary: "Application is unhealthy"
+          description: "The demo application health check is failing"
+
+      # Alert when application is down (no metrics)
+      - alert: ApplicationDown
+        expr: up{job="demo-app"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: demo-app
+        annotations:
+          summary: "Application is down"
+          description: "The demo application is not responding to Prometheus scrapes"
+
+      # Alert for high memory usage (above 500MB)
+      - alert: HighMemoryUsage
+        expr: app_memory_usage_bytes > 500000000
+        for: 10s
+        labels:
+          severity: warning
+          service: demo-app
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is {{ $value | humanize }}B (threshold: 500MB)"
